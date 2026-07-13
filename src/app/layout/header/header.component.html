@@ -1,0 +1,118 @@
+<header class="header-container" [class.scrolled]="isScrolled()">
+  <div class="header-content container-fluid px-4">
+    <!-- Logo -->
+    <a routerLink="/" class="logo-area">
+      <i class="fas fa-crown gold-crown"></i>
+      <div class="logo-text">
+        <span class="logo-main">Game Catalog</span>
+        <span class="logo-sub">CASINO</span>
+      </div>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="desktop-nav d-none d-lg-flex">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-item">HOME</a>
+      <a routerLink="/games" routerLinkActive="active" class="nav-item">GAMES</a>
+      <a routerLink="/providers" routerLinkActive="active" class="nav-item">PROVIDERS</a>
+      <a routerLink="/categories" routerLinkActive="active" class="nav-item">CATEGORIES</a>
+      <!-- <a routerLink="/promotions" routerLinkActive="active" class="nav-item">PROMOTIONS</a>
+      <a routerLink="/vip-club" routerLinkActive="active" class="nav-item">VIP CLUB</a> -->
+    </nav>
+
+    <!-- Right Side: Search & Actions -->
+    <div class="header-actions">
+      <!-- Search Bar -->
+      <div class="search-bar-container d-none d-md-flex">
+        <input type="text" placeholder="Search games..." class="search-input" />
+        <button class="search-btn">
+          <i class="fas fa-search text-secondary"></i>
+        </button>
+      </div>
+
+      <!-- Auth Actions -->
+      @if (!authService.isLoggedIn()) {
+        <div class="auth-buttons d-none d-sm-flex">
+          <a routerLink="/login" class="btn btn-login text-decoration-none d-flex align-items-center justify-content-center">LOGIN</a>
+          <a routerLink="/register" class="btn btn-signup text-decoration-none d-flex align-items-center justify-content-center">SIGN UP</a>
+        </div>
+      } @else {
+        <!-- User Profile Dropdown -->
+        <div class="profile-dropdown-container d-none d-sm-flex position-relative">
+          <div class="profile-wallet-trigger d-flex align-items-center rounded-pill overflow-hidden border border-secondary border-opacity-10 glassmorphism" (click)="toggleProfileDropdown()">
+            <div class="wallet-balance px-3 text-gold font-weight-bold">
+              ₹{{ authService.currentUser()?.walletBalance | number:'1.2-2' }}
+            </div>
+            <div class="profile-avatar px-2 py-1 bg-purple-glow">
+              <i class="fas fa-user-circle text-white fs-5"></i>
+            </div>
+          </div>
+          
+          @if (isProfileDropdownOpen()) {
+            <div class="dropdown-panel glassmorphism rounded-3 p-3 position-absolute end-0 mt-2 shadow-lg">
+              <div class="user-card border-bottom border-secondary border-opacity-10 pb-2 mb-2">
+                <span class="d-block text-white font-weight-bold text-sm">{{ authService.currentUser()?.username }}</span>
+                <span class="d-block text-secondary text-xs text-truncate">{{ authService.currentUser()?.email }}</span>
+              </div>
+              <ul class="list-unstyled dropdown-links m-0">
+                <li><a routerLink="/profile" (click)="closeProfileDropdown()"><i class="fas fa-user-cog me-2"></i>My Profile</a></li>
+                <li><a routerLink="/games" [queryParams]="{filter: 'favorites'}" (click)="closeProfileDropdown()"><i class="fas fa-heart me-2"></i>My Favorites</a></li>
+                <hr class="my-2 border-secondary border-opacity-10" />
+                <li><a (click)="logout()" class="logout-link"><i class="fas fa-sign-out-alt me-2 text-danger"></i>Log Out</a></li>
+              </ul>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Mobile Controls -->
+      <button class="mobile-control-btn d-flex d-md-none" (click)="toggleMobileSearch()">
+        <i class="fas" [class.fa-search]="!isMobileSearchOpen()" [class.fa-times]="isMobileSearchOpen()"></i>
+      </button>
+
+      <button class="mobile-control-btn d-flex d-lg-none" (click)="toggleMobileMenu()">
+        <i class="fas" [class.fa-bars]="!isMobileMenuOpen()" [class.fa-times]="isMobileMenuOpen()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Search Overlay -->
+  @if (isMobileSearchOpen()) {
+    <div class="mobile-search-overlay px-4 py-2 d-md-none">
+      <div class="search-bar-container w-100">
+        <input type="text" placeholder="Search games..." class="search-input" />
+        <button class="search-btn">
+          <i class="fas fa-search text-secondary"></i>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Mobile Side Navigation Drawer -->
+  <div class="mobile-drawer d-lg-none" [class.open]="isMobileMenuOpen()">
+    <nav class="mobile-nav-links">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" (click)="closeMobileMenu()" class="mobile-nav-item">HOME</a>
+      <a routerLink="/games" routerLinkActive="active" (click)="closeMobileMenu()" class="mobile-nav-item">GAMES</a>
+      <a routerLink="/providers" routerLinkActive="active" (click)="closeMobileMenu()" class="mobile-nav-item">PROVIDERS</a>
+      <a routerLink="/categories" routerLinkActive="active" (click)="closeMobileMenu()" class="mobile-nav-item">CATEGORIES</a>
+      <a routerLink="/promotions" routerLinkActive="active" (click)="closeMobileMenu()" class="mobile-nav-item">PROMOTIONS</a>
+      <a routerLink="/vip-club" routerLinkActive="active" (click)="closeMobileMenu()" class="mobile-nav-item">VIP CLUB</a>
+      <hr class="drawer-divider" />
+      @if (!authService.isLoggedIn()) {
+        <div class="drawer-auth-buttons mt-4">
+          <a routerLink="/login" class="btn btn-login w-100 mb-3 text-decoration-none d-flex align-items-center justify-content-center" (click)="closeMobileMenu()">LOGIN</a>
+          <a routerLink="/register" class="btn btn-signup w-100 text-decoration-none d-flex align-items-center justify-content-center" (click)="closeMobileMenu()">SIGN UP</a>
+        </div>
+      } @else {
+        <div class="drawer-user-info mt-4 pb-3 border-bottom border-secondary border-opacity-10">
+          <span class="text-white font-weight-bold d-block">{{ authService.currentUser()?.username }}</span>
+          <span class="text-secondary text-sm d-block">{{ authService.currentUser()?.email }}</span>
+          <span class="text-gold font-weight-bold d-block mt-2">Balance: ₹{{ authService.currentUser()?.walletBalance | number:'1.2-2' }}</span>
+        </div>
+        <div class="drawer-auth-buttons mt-3">
+          <a routerLink="/profile" class="btn btn-login w-100 mb-3 text-decoration-none d-flex align-items-center justify-content-center" (click)="closeMobileMenu()"><i class="fas fa-user-cog me-2"></i>Profile</a>
+          <button class="btn btn-danger w-100 py-2 font-weight-bold" (click)="logout(); closeMobileMenu()"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+        </div>
+      }
+    </nav>
+  </div>
+</header>

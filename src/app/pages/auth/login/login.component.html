@@ -1,0 +1,75 @@
+<div class="auth-page-container d-flex align-items-center justify-content-center py-5">
+  <div class="auth-card glassmorphism rounded-4 p-4 p-sm-5 text-center shadow-lg">
+    <!-- Brand Logo -->
+    <a routerLink="/" class="logo-area mb-4 d-inline-flex align-items-center gap-2 justify-content-center text-decoration-none">
+      <i class="fas fa-crown gold-crown fs-2"></i>
+      <div class="logo-text text-start">
+        <span class="logo-main text-white font-weight-bold">Game Catalog</span>
+        <span class="logo-sub text-gold d-block">CASINO</span>
+      </div>
+    </a>
+
+    <h2 class="text-white mb-2">Welcome Back</h2>
+    <p class="text-secondary mb-4">Log in to your account to start playing</p>
+
+    <!-- Reactive Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="text-start">
+      <!-- Email field -->
+      <div class="mb-3">
+        <label for="email" class="form-label text-secondary text-uppercase text-sm font-weight-bold">Email Address</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope input-icon text-secondary"></i>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email" 
+            placeholder="name@example.com" 
+            class="form-control auth-input"
+            [class.is-invalid]="submitted() && f['email'].errors"
+          />
+        </div>
+        @if (submitted() && f['email'].errors) {
+          <div class="invalid-feedback d-block mt-1">
+            @if (f['email'].errors['required']) { Email is required }
+            @if (f['email'].errors['email']) { Enter a valid email address }
+          </div>
+        }
+      </div>
+
+      <!-- Password field -->
+      <div class="mb-4">
+        <div class="d-flex justify-content-between">
+          <label for="password" class="form-label text-secondary text-uppercase text-sm font-weight-bold">Password</label>
+          <a routerLink="/forgot-password" class="forgot-link text-purple text-sm text-decoration-none">Forgot?</a>
+        </div>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon text-secondary"></i>
+          <input 
+            type="password" 
+            id="password" 
+            formControlName="password" 
+            placeholder="••••••••" 
+            class="form-control auth-input"
+            [class.is-invalid]="submitted() && f['password'].errors"
+          />
+        </div>
+        @if (submitted() && f['password'].errors) {
+          <div class="invalid-feedback d-block mt-1">
+            @if (f['password'].errors['required']) { Password is required }
+            @if (f['password'].errors['minlength']) { Password must be at least 6 characters }
+          </div>
+        }
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-signup w-100 py-3 rounded-pill font-weight-bold mb-3">
+        LOG IN
+      </button>
+
+      <div class="text-center mt-3">
+        <span class="text-secondary text-sm">Don't have an account? </span>
+        <a routerLink="/register" class="text-purple font-weight-bold text-sm text-decoration-none">Register here</a>
+      </div>
+    </form>
+  </div>
+</div>

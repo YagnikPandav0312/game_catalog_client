@@ -1,0 +1,9 @@
+<a [routerLink]="['/providers', provider.slug]" class="provider-card-link text-decoration-none">
+  <div class="provider-card glassmorphism glow-on-hover">
+    <div class="provider-logo-container">
+      <i [class]="provider.logo"></i>
+    </div>
+    <h4 class="provider-name text-white m-0 text-truncate">{{ provider.name }}</h4>
+    <span class="provider-game-count text-secondary">{{ provider.gameCount || 0 }} Games</span>
+  </div>
+</a>

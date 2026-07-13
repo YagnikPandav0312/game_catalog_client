@@ -1,0 +1,69 @@
+<div class="providers-container container-fluid px-4 py-4">
+  <!-- Header Banner -->
+  <div class="providers-header premium-page-header rounded-4 p-5 mb-4 text-center">
+    <h1 class="text-white mb-2">GAME PROVIDERS</h1>
+    <p class="text-secondary m-0">Explore slots, live tables, and game shows from the world's leading creators</p>
+  </div>
+
+  <!-- Search & Stats Bar -->
+  <div class="filter-bar glassmorphism rounded-3 p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="search-input-container premium-search">
+      <i class="fas fa-search search-icon text-secondary me-2"></i>
+      <input 
+        type="text" 
+        placeholder="Search provider studios..." 
+        class="search-input" 
+        [value]="searchQuery()" 
+        (input)="onSearch($event)" 
+      />
+    </div>
+    <div class="stats-label text-secondary">
+      Showing <span class="text-white">{{ filteredProviders().length }}</span> providers
+    </div>
+  </div>
+
+  <!-- Providers Grid -->
+  @if (paginatedProviders().length > 0) {
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+      @for (provider of paginatedProviders(); track provider.id) {
+        <div class="col">
+          <app-provider-card [provider]="provider"></app-provider-card>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination Controls -->
+    @if (totalPages() > 1) {
+      <div class="pagination-container mt-5 d-flex justify-content-center align-items-center gap-2">
+        <button 
+          class="page-btn-node" 
+          [disabled]="currentPage() === 1" 
+          (click)="goToPage(currentPage() - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        @for (page of pageNumbers(); track page) {
+          <button 
+            class="page-btn-node" 
+            [class.active]="currentPage() === page" 
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+        
+        <button 
+          class="page-btn-node" 
+          [disabled]="currentPage() === totalPages()" 
+          (click)="goToPage(currentPage() + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="empty-state text-center py-5 rounded glassmorphism">
+      <i class="fas fa-ghost text-purple fs-1 mb-3"></i>
+      <h4 class="text-white">No Providers Found</h4>
+      <p class="text-secondary">Try searching for a different game studio</p>
+    </div>
+  }
+</div>

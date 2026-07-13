@@ -1,0 +1,64 @@
+.provider-detail-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+/* Bio Banner */
+.bio-banner {
+  background: radial-gradient(circle at 10% 50%, rgba(140, 82, 255, 0.25) 0%, rgba(11, 9, 20, 0.95) 100%), 
+              linear-gradient(135deg, #100b26 0%, #08060f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.provider-logo-emblem {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.emblem-icon {
+  font-size: 3.5rem;
+}
+
+.provider-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.max-width-desc {
+  max-width: 700px;
+}
+
+.stat-chip {
+  background: rgba(22, 19, 39, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  min-width: 130px;
+  text-align: center;
+}
+
+.stat-chip small {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.stat-chip span {
+  font-size: 1.1rem;
+}
+
+/* Releases Title Bar */
+.section-title-bar h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  border-left: 4px solid var(--accent-purple);
+  padding-left: 12px;
+}

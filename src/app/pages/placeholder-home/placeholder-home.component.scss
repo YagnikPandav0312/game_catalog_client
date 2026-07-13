@@ -1,0 +1,25 @@
+.border-glow {
+  border: 1px solid rgba(140, 82, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  &:hover {
+    border-color: var(--accent-purple);
+    box-shadow: 0 8px 32px 0 rgba(140, 82, 255, 0.15);
+  }
+}
+
+.btn-signup {
+  color: #ffffff;
+  background: var(--accent-purple);
+  border: 1px solid var(--accent-purple);
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 8px 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(140, 82, 255, 0.3);
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(140, 82, 255, 0.5);
+  }
+}

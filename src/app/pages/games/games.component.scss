@@ -1,0 +1,66 @@
+.games-page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+/* Sidebar Filters */
+.sidebar-filters {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  position: sticky;
+  top: 90px;
+}
+
+.btn-clear {
+  background: none;
+  border: none;
+  color: var(--accent-purple);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.filter-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* Sorting bar */
+.sorting-bar {
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Mobile responsive drawer */
+@media (max-width: 991px) {
+  .sidebar-filters {
+    display: none;
+    position: fixed;
+    top: 72px;
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 72px);
+    z-index: 998;
+    background: rgba(11, 9, 20, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow-y: auto;
+    padding-bottom: 80px;
+    border: none;
+    border-radius: 0 !important;
+  }
+}

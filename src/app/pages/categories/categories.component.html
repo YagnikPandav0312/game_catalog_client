@@ -1,0 +1,63 @@
+<div class="categories-container container-fluid px-4 py-4">
+  <!-- Header Banner -->
+  <div class="categories-header premium-page-header rounded-4 p-5 mb-4 text-center">
+    <h1 class="text-white mb-2">GAME CATEGORIES</h1>
+    <p class="text-secondary m-0">Browse through our handpicked selections of online casino entertainment</p>
+  </div>
+
+  <!-- Search & Stats Bar -->
+  <div class="filter-bar glassmorphism rounded-3 p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="search-input-container premium-search">
+      <i class="fas fa-search search-icon text-secondary me-2"></i>
+      <input 
+        type="text" 
+        placeholder="Search categories..." 
+        class="search-input" 
+        [value]="searchQuery()" 
+        (input)="onSearch($event)" 
+      />
+    </div>
+    <div class="stats-label text-secondary">
+      Showing <span class="text-white">{{ filteredCategories().length }}</span> categories
+    </div>
+  </div>
+
+  <!-- Categories Grid -->
+  @if (filteredCategories().length > 0) {
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      @for (category of filteredCategories(); track category.id) {
+        <div class="col">
+          <a [routerLink]="['/categories', category.slug]" class="category-card-link text-decoration-none">
+            <div class="category-card glassmorphism glow-on-hover p-4 d-flex flex-column h-100 position-relative overflow-hidden" [style.border-color]="category.color + '22'">
+              <!-- Color Accent Indicator -->
+              <div class="color-indicator" [style.background-color]="category.color"></div>
+              
+              <div class="d-flex align-items-center mb-3">
+                <div class="category-icon-container me-3 d-flex align-items-center justify-content-center" [style.color]="category.color" [style.background-color]="category.color + '15'">
+                  <i [class]="category.icon + ' fs-3'"></i>
+                </div>
+                <div>
+                  <h3 class="category-title text-white m-0">{{ category.name }}</h3>
+                  <span class="category-count text-secondary">{{ category.count }} Games</span>
+                </div>
+              </div>
+              
+              <p class="category-desc text-secondary flex-grow-1 mb-3">{{ category.description }}</p>
+              
+              <div class="action-footer d-flex align-items-center text-purple font-weight-bold">
+                <span>Explore Games</span>
+                <i class="fas fa-arrow-right ms-2 transition-arrow"></i>
+              </div>
+            </div>
+          </a>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="empty-state text-center py-5 rounded glassmorphism">
+      <i class="fas fa-ghost text-purple fs-1 mb-3"></i>
+      <h4 class="text-white">No Categories Found</h4>
+      <p class="text-secondary">Try searching for a different game category</p>
+    </div>
+  }
+</div>

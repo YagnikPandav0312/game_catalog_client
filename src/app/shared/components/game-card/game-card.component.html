@@ -1,0 +1,23 @@
+<div class="game-card-wrapper glow-on-hover" [routerLink]="['/games', game.slug]" style="cursor: pointer;">
+  <div class="game-thumbnail-container">
+    <img [src]="game.image" [alt]="game.title" class="game-thumbnail img-fluid" loading="lazy" />
+    
+    <!-- Hover Overlay -->
+    <div class="hover-overlay">
+      <button class="play-btn rounded-circle" (click)="onPlay($event)">
+        <i class="fas fa-play"></i>
+      </button>
+      <button class="fav-btn btn-sm" (click)="onFavorite($event)">
+        <i [class]="game.isFavorite ? 'fas fa-heart text-danger' : 'far fa-heart'"></i>
+      </button>
+    </div>
+  </div>
+  
+  <div class="game-meta mt-2">
+    <h5 class="game-title text-truncate text-white m-0">{{ game.title }}</h5>
+    <div class="d-flex justify-content-between align-items-center mt-1">
+      <span class="game-provider text-truncate text-secondary">{{ game.provider }}</span>
+      <span class="badge badge-type rounded px-2 py-1 text-sm text-secondary">{{ game.gameType }}</span>
+    </div>
+  </div>
+</div>

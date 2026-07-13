@@ -1,0 +1,152 @@
+<div class="games-page-container container-fluid px-4 py-4">
+  <!-- Banner Header -->
+  <div class="games-header premium-page-header rounded-4 p-5 mb-4 text-center">
+    <h1 class="text-white mb-2">ALL GAMES</h1>
+    <p class="text-secondary m-0">Explore slot games, tables, card games, live stream dealer programs and more</p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Sidebar: Filters -->
+    <div class="col-lg-3">
+      <!-- Mobile Filter Trigger -->
+      <button class="btn btn-login w-100 d-lg-none mb-3 py-2" (click)="toggleMobileFilters()">
+        <i class="fas fa-filter me-2"></i> {{ isMobileFiltersOpen() ? 'Close Filters' : 'Filter & Sort' }}
+      </button>
+
+      <aside class="sidebar-filters glassmorphism rounded-3 p-4 d-none d-lg-block" [class.d-block]="isMobileFiltersOpen()">
+        <!-- Filter Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="text-white m-0 font-weight-bold"><i class="fas fa-sliders-h text-purple me-2"></i>FILTERS</h5>
+          <button class="btn-clear" (click)="clearFilters()">Clear All</button>
+        </div>
+
+        <!-- Search input inside filters -->
+        <div class="filter-group mb-4">
+          <label class="filter-label text-secondary mb-2">Search Games</label>
+          <div class="search-input-wrapper premium-search">
+            <i class="fas fa-search search-icon text-secondary me-2"></i>
+            <input 
+              type="text" 
+              placeholder="Search title..." 
+              class="search-input" 
+              [value]="searchQuery()" 
+              (input)="onSearch($event)" 
+            />
+          </div>
+        </div>
+
+        <!-- Provider filter -->
+        <div class="filter-group mb-4">
+          <label class="filter-label text-secondary mb-2">Game Provider</label>
+          <select class="form-select premium-select" (change)="onProviderChange($event)">
+            <option value="">All Providers</option>
+            @for (provider of providers(); track provider.id) {
+              <option [value]="provider.slug" [selected]="selectedProvider() === provider.slug">{{ provider.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Category filter -->
+        <div class="filter-group mb-4">
+          <label class="filter-label text-secondary mb-2">Game Category</label>
+          <select class="form-select premium-select" (change)="onCategoryChange($event)">
+            <option value="">All Categories</option>
+            @for (cat of categories(); track cat.id) {
+              <option [value]="cat.slug" [selected]="selectedCategory() === cat.slug">{{ cat.name }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Game Type filter -->
+        <div class="filter-group mb-4">
+          <label class="filter-label text-secondary mb-2">Game Type</label>
+          <div class="checkbox-list">
+            @for (type of gameTypes(); track type) {
+              <div class="form-check">
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  [id]="'type-' + type" 
+                  [checked]="selectedGameTypes().includes(type)"
+                  (change)="toggleGameType(type)"
+                />
+                <label class="form-check-label text-white-50" [for]="'type-' + type">{{ type }}</label>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Device filter -->
+        <div class="filter-group mb-2">
+          <label class="filter-label text-secondary mb-2">Compatibility Device</label>
+          <div class="checkbox-list">
+            @for (dev of deviceTypes(); track dev) {
+              <div class="form-check">
+                <input 
+                  type="checkbox" 
+                  class="form-check-input" 
+                  [id]="'dev-' + dev" 
+                  [checked]="selectedDevices().includes(dev)"
+                  (change)="toggleDevice(dev)"
+                />
+                <label class="form-check-label text-white-50" [for]="'dev-' + dev">{{ dev }}</label>
+              </div>
+            }
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Right Side: Sorting & Games Grid -->
+    <div class="col-lg-9">
+      <div class="sorting-bar glassmorphism rounded-3 p-3 mb-4 d-flex justify-content-between align-items-center gap-3">
+        <div class="results-count text-secondary">
+          Showing <span class="text-white">{{ filteredGames().length }}</span> games
+        </div>
+        <div class="sort-select-wrapper d-flex align-items-center gap-2">
+          <span class="text-secondary text-sm d-none d-sm-inline">Sort by:</span>
+          <select class="form-select premium-select" (change)="onSortChange($event)">
+            <option value="popularity">Popularity</option>
+            <option value="az">Name: A-Z</option>
+            <option value="za">Name: Z-A</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Games Grid -->
+      @if (paginatedGames().length > 0) {
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3">
+          @for (game of paginatedGames(); track game.id) {
+            <div class="col">
+              <app-game-card 
+                [game]="game" 
+                (favoriteToggled)="onFavoriteToggled($event)"
+                (playClicked)="onPlayClicked($event)">
+              </app-game-card>
+            </div>
+          }
+        </div>
+
+        <!-- Load More / Infinite Scroll Simulated Spinner -->
+        @if (hasMoreItems()) {
+          <div class="load-more-container text-center mt-5">
+            <button class="btn btn-signup rounded-pill px-5 py-3" [disabled]="isLoadingMore()" (click)="loadMore()">
+              @if (isLoadingMore()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Loading...
+              } @else {
+                LOAD MORE GAMES
+              }
+            </button>
+          </div>
+        }
+      } @else {
+        <div class="empty-state text-center py-5 rounded glassmorphism w-100">
+          <i class="fas fa-gamepad text-purple fs-1 mb-3"></i>
+          <h4 class="text-white">No Games Found</h4>
+          <p class="text-secondary">Try adjusting your filters or search keywords</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

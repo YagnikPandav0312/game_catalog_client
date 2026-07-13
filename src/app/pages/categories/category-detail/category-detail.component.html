@@ -1,0 +1,112 @@
+<div class="category-detail-container container-fluid px-4 py-4" *ngIf="category()">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/categories">Categories</a></li>
+      <li class="breadcrumb-item active">{{ category()?.name }}</li>
+    </ol>
+  </nav>
+
+  <!-- Category Banner -->
+  <div class="category-banner rounded-4 p-4 p-md-5 mb-5 d-flex flex-column flex-lg-row align-items-center gap-4 position-relative overflow-hidden" [style.border-color]="category()?.color + '22'">
+    <!-- Color glow effect -->
+    <div class="banner-glow-effect" [style.background]="'radial-gradient(circle, ' + category()?.color + '20 0%, transparent 70%)'"></div>
+
+    <div class="category-logo-emblem glassmorphism rounded-circle d-flex align-items-center justify-content-center" [style.color]="category()?.color" [style.background-color]="category()?.color + '15'">
+      <i [class]="category()?.icon + ' emblem-icon'"></i>
+    </div>
+    <div class="category-info flex-grow-1 text-center text-lg-start z-1">
+      <h1 class="text-white mb-2 text-uppercase">{{ category()?.name }}</h1>
+      <p class="text-secondary category-desc max-width-desc m-0">
+        {{ category()?.description }}
+      </p>
+      
+      <!-- Stats Chip -->
+      <div class="stats-grid mt-4 d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+        <div class="stat-chip rounded-3 px-3 py-2">
+          <small class="text-secondary d-block">TOTAL GAMES AVAILABLE</small>
+          <span class="text-white font-weight-bold" [style.color]="category()?.color">{{ categoryGames().length }} Titles</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search, Sort & Title Bar -->
+  <div class="filter-bar-row glassmorphism rounded-3 p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div class="d-flex align-items-center gap-2">
+      <h3 class="text-white m-0 fs-5 text-uppercase">{{ category()?.name }} Grid View</h3>
+    </div>
+    <div class="d-flex flex-wrap align-items-center gap-3">
+      <!-- Search Input -->
+      <div class="search-bar-container premium-search">
+        <i class="fas fa-search search-icon text-secondary me-2"></i>
+        <input 
+          type="text" 
+          placeholder="Search in this category..." 
+          class="search-input" 
+          [value]="searchQuery()" 
+          (input)="onSearch($event)" 
+        />
+      </div>
+
+      <!-- Sort Dropdown -->
+      <div class="sort-container">
+        <select class="form-select premium-select rounded-pill px-3 py-2" [value]="currentSort()" (change)="onSortChange($event)">
+          <option value="popularity">Popularity</option>
+          <option value="az">A - Z</option>
+          <option value="za">Z - A</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Games Grid -->
+  @if (paginatedGames().length > 0) {
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+      @for (game of paginatedGames(); track game.id) {
+        <div class="col">
+          <app-game-card 
+            [game]="game" 
+            (favoriteToggled)="onFavoriteToggled($event)" 
+            (playClicked)="onPlayClicked($event)">
+          </app-game-card>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination Controls -->
+    @if (totalPages() > 1) {
+      <div class="pagination-container mt-5 d-flex justify-content-center align-items-center gap-2">
+        <button 
+          class="page-btn-node" 
+          [disabled]="currentPage() === 1" 
+          (click)="goToPage(currentPage() - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        @for (page of pageNumbers(); track page) {
+          <button 
+            class="page-btn-node" 
+            [class.active]="currentPage() === page" 
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+        
+        <button 
+          class="page-btn-node" 
+          [disabled]="currentPage() === totalPages()" 
+          (click)="goToPage(currentPage() + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="empty-state text-center py-5 rounded glassmorphism w-100">
+      <i class="fas fa-ghost text-purple fs-1 mb-3"></i>
+      <h4 class="text-white">No Games Found</h4>
+      <p class="text-secondary">Try searching for a different game title</p>
+    </div>
+  }
+</div>

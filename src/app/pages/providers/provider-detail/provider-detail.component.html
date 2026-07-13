@@ -1,0 +1,115 @@
+<div class="provider-detail-container container-fluid px-4 py-4" *ngIf="provider()">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/providers">Providers</a></li>
+      <li class="breadcrumb-item active">{{ provider()?.name }}</li>
+    </ol>
+  </nav>
+
+  <!-- Provider Bio Banner -->
+  <div class="bio-banner rounded-4 p-4 p-md-5 mb-5 d-flex flex-column flex-lg-row align-items-center gap-4">
+    <div class="provider-logo-emblem glassmorphism rounded-circle">
+      <i [class]="provider()?.logo + ' emblem-icon'"></i>
+    </div>
+    <div class="provider-info flex-grow-1 text-center text-lg-start">
+      <h1 class="text-white mb-2 text-uppercase">{{ provider()?.name }}</h1>
+      <p class="text-secondary provider-desc max-width-desc">
+        {{ provider()?.description }}
+      </p>
+      
+      <!-- Stats Grid -->
+      <div class="stats-grid mt-4 d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+        <div class="stat-chip rounded-3 px-3 py-2">
+          <small class="text-secondary d-block">TOTAL GAMES</small>
+          <span class="text-white font-weight-bold">{{ provider()?.gameCount }}</span>
+        </div>
+        <div class="stat-chip rounded-3 px-3 py-2">
+          <small class="text-secondary d-block">AVERAGE RTP</small>
+          <span class="text-gold font-weight-bold">{{ provider()?.avgRtp }}</span>
+        </div>
+        <div class="stat-chip rounded-3 px-3 py-2">
+          <small class="text-secondary d-block">VOLATILITY</small>
+          <span class="text-purple font-weight-bold">{{ provider()?.volatility }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Title Bar -->
+  <div class="section-title-bar d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <h3 class="text-white m-0">STUDIO RELEASES</h3>
+    <div class="search-bar-container premium-search">
+      <i class="fas fa-search search-icon text-secondary me-2"></i>
+      <input 
+        type="text" 
+        placeholder="Search in this studio..." 
+        class="search-input" 
+        [value]="searchQuery()" 
+        (input)="onSearch($event)" 
+      />
+    </div>
+  </div>
+
+  <!-- Games Grid -->
+  @if (paginatedGames().length > 0) {
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+      @for (game of paginatedGames(); track game.id) {
+        <div class="col">
+          <div class="game-card-wrapper glow-on-hover" [routerLink]="['/games', game.slug]" style="cursor: pointer;">
+            <div class="game-thumbnail-container">
+              <img [src]="game.image" [alt]="game.title" class="game-thumbnail img-fluid" loading="lazy" />
+              <div class="hover-overlay">
+                <button class="play-btn rounded-circle">
+                  <i class="fas fa-play"></i>
+                </button>
+                <button class="fav-btn btn-sm">
+                  <i class="far fa-heart"></i>
+                </button>
+              </div>
+            </div>
+            <div class="game-meta mt-2 text-center text-sm-start">
+              <h5 class="game-title text-truncate text-white m-0">{{ game.title }}</h5>
+              <span class="game-provider text-truncate text-secondary">{{ game.provider }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination Controls -->
+    @if (totalPages() > 1) {
+      <div class="pagination-container mt-5 d-flex justify-content-center align-items-center gap-2">
+        <button 
+          class="page-btn-node" 
+          [disabled]="currentPage() === 1" 
+          (click)="goToPage(currentPage() - 1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        @for (page of pageNumbers(); track page) {
+          <button 
+            class="page-btn-node" 
+            [class.active]="currentPage() === page" 
+            (click)="goToPage(page)">
+            {{ page }}
+          </button>
+        }
+        
+        <button 
+          class="page-btn-node" 
+          [disabled]="currentPage() === totalPages()" 
+          (click)="goToPage(currentPage() + 1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  } @else {
+    <div class="empty-state text-center py-5 rounded glassmorphism w-100">
+      <i class="fas fa-ghost text-purple fs-1 mb-3"></i>
+      <h4 class="text-white">No Games Found</h4>
+      <p class="text-secondary">Try searching for another game title</p>
+    </div>
+  }
+</div>

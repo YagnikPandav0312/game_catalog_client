@@ -1,1 +1,441 @@
-/* You can add global styles to this file, and also import other style files */
+// Import Font Awesome
+@import "@fortawesome/fontawesome-free/css/all.css";
+@import '../node_modules/ngx-toastr/toastr.css';
+@import '../node_modules/ngx-spinner/animations/ball-scale-multiple.css';
+// Import Bootstrap core
+@import "bootstrap/scss/bootstrap";
+
+:root {
+  --primary-bg: #0b0914;
+  --surface-bg: #161327;
+  --surface-hover: #1f1b36;
+  --accent-purple: #8c52ff;
+  --accent-purple-glow: rgba(140, 82, 255, 0.45);
+  --accent-gold: #ffd700;
+  --accent-gold-glow: rgba(255, 215, 0, 0.45);
+  --text-primary: #ffffff;
+  --text-secondary: #8e8c9c;
+  --glass-bg: rgba(22, 19, 39, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background-color: var(--primary-bg);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-bg);
+  border-radius: 4px;
+  border: 1px solid var(--glass-border);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-purple);
+}
+
+/* Base utility styles */
+.text-gold {
+  color: var(--accent-gold) !important;
+}
+
+.text-purple {
+  color: var(--accent-purple) !important;
+}
+
+.bg-surface {
+  background-color: var(--surface-bg) !important;
+}
+
+.glassmorphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Premium Card hover glow effect */
+.glow-on-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-purple);
+    box-shadow: 0 10px 25px var(--accent-purple-glow);
+  }
+}
+
+.glow-gold-on-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-gold);
+    box-shadow: 0 10px 25px var(--accent-gold-glow);
+  }
+}
+
+/* Common Auth Page Layout & Forms styling */
+.auth-page-container {
+  min-height: 80vh;
+  background-color: var(--primary-bg);
+}
+
+.auth-card {
+  width: 460px;
+  max-width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+}
+
+.gold-crown {
+  color: var(--accent-gold);
+  filter: drop-shadow(0 0 5px var(--accent-gold-glow));
+}
+
+.logo-main {
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.logo-sub {
+  font-size: 0.85rem;
+  letter-spacing: 3px;
+  color: var(--accent-gold);
+}
+
+.text-sm {
+  font-size: 0.8rem;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+}
+
+.auth-input {
+  background-color: rgba(22, 19, 39, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 12px 15px 12px 45px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    background-color: rgba(22, 19, 39, 0.95);
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 8px var(--accent-purple-glow);
+    color: #ffffff;
+  }
+}
+
+.forgot-link {
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.invalid-feedback {
+  color: #ff1744;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.form-check-input {
+  background-color: rgba(22, 19, 39, 0.8);
+  border-color: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  margin-top: 0.25em;
+
+  &:checked {
+    background-color: var(--accent-purple);
+    border-color: var(--accent-purple);
+  }
+
+  &:focus {
+    box-shadow: 0 0 6px var(--accent-purple-glow);
+  }
+}
+
+.form-check-label {
+  cursor: pointer;
+}
+
+.btn-signup {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+  color: #ffffff;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(140, 82, 255, 0.5);
+  }
+}
+
+/* Premium Search Bar Utility */
+.premium-search {
+  position: relative;
+  width: 280px;
+  max-width: 100%;
+  border-radius: 20px;
+  background: rgba(22, 19, 39, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  transition: width 0.3s, border-color 0.3s;
+
+  &:focus-within {
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 8px var(--accent-purple-glow);
+  }
+
+  .search-input {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    outline: none;
+    font-size: 0.85rem;
+    width: 100%;
+
+    &::placeholder {
+      color: var(--text-secondary);
+    }
+  }
+
+  .search-btn {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 0;
+  }
+}
+
+/* Premium Page Header Backgrounds */
+.premium-page-header {
+  background: radial-gradient(circle at 50% 50%, rgba(140, 82, 255, 0.15) 0%, rgba(11, 9, 20, 0.95) 100%),
+    linear-gradient(135deg, #100b26 0%, #08060f 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+}
+
+/* Global Breadcrumb Styling */
+.breadcrumb-nav .breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.breadcrumb-nav .breadcrumb-item {
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  &.active {
+    color: var(--accent-purple);
+  }
+
+  a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #ffffff;
+    }
+  }
+
+  &+.breadcrumb-item::before {
+    color: var(--text-secondary);
+  }
+}
+
+/* Global Pagination Button Node */
+.page-btn-node {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover:not([disabled]) {
+    background: rgba(140, 82, 255, 0.1);
+    color: #ffffff;
+    border-color: var(--accent-purple);
+  }
+
+  &.active {
+    background: var(--accent-purple);
+    color: #ffffff;
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 12px var(--accent-purple-glow);
+  }
+
+  &[disabled] {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+}
+
+/* Global Empty State */
+.empty-state {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Premium Form Select styling */
+.premium-select {
+  background-color: rgba(22, 19, 39, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.3s;
+
+  &:focus {
+    background-color: #161327;
+    color: #ffffff;
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 6px var(--accent-purple-glow);
+  }
+
+  option {
+    background: #161327;
+    color: #ffffff;
+  }
+}
+
+/* Premium Game Card styling (used by inline HTML game lists) */
+.game-card-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: rgba(22, 19, 39, 0.25);
+  padding: 6px;
+}
+
+.game-thumbnail-container {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 4/5;
+  background-color: #0b0914;
+}
+
+.game-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.hover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 8, 20, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.game-card-wrapper:hover .game-thumbnail {
+  transform: scale(1.08);
+}
+
+.game-card-wrapper:hover .hover-overlay {
+  opacity: 1;
+}
+
+.play-btn {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: var(--accent-purple);
+  color: #ffffff;
+  font-size: 1.15rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 15px var(--accent-purple);
+  border-radius: 50%;
+}
+
+.play-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px var(--accent-purple);
+}
+
+.fav-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.fav-btn:hover {
+  background: var(--accent-purple);
+  border-color: var(--accent-purple);
+}
+
+.game-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.game-provider {
+  font-size: 0.75rem;
+  display: block;
+}

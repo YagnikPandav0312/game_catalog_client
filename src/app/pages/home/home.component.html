@@ -1,0 +1,183 @@
+<div class="home-wrapper container-fluid px-4 py-3">
+
+  <!-- Hero Banner -->
+  <section class="hero-section rounded-4 mb-4">
+    <div class="row align-items-center h-100 px-4 px-md-5 py-5">
+      <div class="col-lg-6 hero-text-col">
+        <span class="badge text-uppercase bg-purple-glow text-purple mb-3 px-3 py-2 rounded-pill font-weight-bold">
+          Welcome Bonus
+        </span>
+        <h1 class="hero-title text-white mb-2">100% UP TO <span class="text-gold">₹50,000</span></h1>
+        <h2 class="hero-subtitle text-white mb-4">+ 200 FREE SPINS</h2>
+        <button class="btn btn-hero btn-signup px-5 py-3">PLAY NOW</button>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block hero-img-col text-center">
+        <!-- Render a stylish SVG illustration if no image is ready -->
+        <div class="hero-graphic-placeholder">
+          <i class="fas fa-dice dice-floater f1"></i>
+          <i class="fas fa-coins coin-floater f2"></i>
+          <i class="fas fa-spade spade-floater f3"></i>
+          <i class="fas fa-trophy trophy-floater f4"></i>
+          <div class="glowing-wheel">
+            <i class="fas fa-dharmachakra wheel-icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust Info Bar -->
+  <section class="trust-bar glassmorphism rounded-3 mb-5 px-3 py-4">
+    <div class="row text-center gy-3">
+      <div class="col-md-3 col-6 border-end-md">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-headset text-purple fs-3 mb-2"></i>
+          <span class="text-white font-weight-bold text-sm">24/7 SUPPORT</span>
+          <small class="text-secondary">We are here anytime</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 border-end-md">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-bolt text-gold fs-3 mb-2"></i>
+          <span class="text-white font-weight-bold text-sm">FAST PAYOUTS</span>
+          <small class="text-secondary">Quick withdrawals</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-6 border-end-md">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-crown text-purple fs-3 mb-2"></i>
+          <span class="text-white font-weight-bold text-sm">VIP PROGRAM</span>
+          <small class="text-secondary">Exclusive rewards</small>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="d-flex flex-column align-items-center">
+          <i class="fas fa-shield-alt text-gold fs-3 mb-2"></i>
+          <span class="text-white font-weight-bold text-sm">SAFE & SECURE</span>
+          <small class="text-secondary">100% secure gaming</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Top Providers -->
+  <section class="mb-5">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-white m-0">TOP PROVIDERS</h3>
+      <div class="header-controls d-flex align-items-center gap-3">
+        <a routerLink="/providers" class="view-all">View all</a>
+        <div class="slide-arrows">
+          <button class="arrow-btn"><i class="fas fa-chevron-left"></i></button>
+          <button class="arrow-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="providers-scroll-container">
+      @for (provider of providers(); track provider.provider_id) {
+        <a [routerLink]="['/providers', provider.slug]" class="provider-card glassmorphism text-decoration-none">
+          <div class="provider-icon-wrapper">
+            <img [src]="provider.logo" [alt]="provider.provider_name" class="provider-logo img-fluid" loading="lazy" />
+          </div>
+          <span class="provider-name">{{ provider.provider_name }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- Game Categories -->
+  <section class="mb-5">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-white m-0">GAME CATEGORIES</h3>
+      <a routerLink="/categories" class="view-all">View all</a>
+    </div>
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-3">
+      @for (category of categories(); track category.game_categorie_id) {
+        <div class="col">
+          <a [routerLink]="['/categories', category.slug]" class="category-card rounded-3 text-decoration-none">
+            <!-- <div class="category-icon">
+              <img [src]="category.icon" [alt]="category.game_categorie_name" class="category-icon" loading="lazy" />
+            </div> -->
+            <span class="category-name text-white">{{ category.game_categorie_name }}</span>
+            <!-- <small class="category-count text-secondary">{{ category.count }} Games</small> -->
+          </a>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Popular Games -->
+  <section class="mb-5">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-white m-0">GAMES</h3>
+      <div class="header-controls d-flex align-items-center gap-3">
+        <a routerLink="/games" [queryParams]="{filter: 'popular'}" class="view-all">View all</a>
+        <div class="slide-arrows">
+          <button class="arrow-btn"><i class="fas fa-chevron-left"></i></button>
+          <button class="arrow-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-6 g-3">
+      @for (game of games(); track game.game_id) {
+        <div class="col">
+          <div class="game-card-wrapper glow-on-hover" [routerLink]="['/games', game.slug]" style="cursor: pointer;">
+            <div class="game-thumbnail-container">
+              <img [src]="game.thumbnail" [alt]="game.game_name" class="game-thumbnail img-fluid" loading="lazy" />
+              <div class="hover-overlay">
+                <button class="play-btn rounded-circle">
+                  <i class="fas fa-play"></i>
+                </button>
+                <button class="fav-btn btn-sm">
+                  <i class="far fa-heart"></i>
+                </button>
+              </div>
+            </div>
+            <div class="game-meta mt-2">
+              <h5 class="game-title text-truncate text-white m-0">{{ game.game_name }}</h5>
+              <span class="game-provider text-truncate text-secondary">{{ game.provider_name }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+  <!-- Promotions -->
+  <section class="mb-5">
+    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-white m-0">SPECIAL PROMOTIONS</h3>
+      <a routerLink="/promotions" class="view-all">View all</a>
+    </div>
+    <div class="row gy-4">
+      @for (promo of promotions(); track promo.id) {
+        <div class="col-lg-4 col-md-6">
+          <div class="promo-card rounded-4 p-4 text-white overflow-hidden" [style.background]="promo.color">
+            <div class="promo-content">
+              <span class="badge bg-dark-opacity mb-3">{{ promo.badge }}</span>
+              <h4 class="promo-title mb-2">{{ promo.title }}</h4>
+              <p class="promo-desc text-white-50 mb-4">{{ promo.description }}</p>
+              <button class="btn btn-light rounded-pill px-4 py-2 font-weight-bold">Claim Now</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Newsletter Section -->
+  <section class="newsletter-section glassmorphism rounded-4 p-5 text-center mb-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <i class="fas fa-paper-plane text-purple fs-1 mb-3"></i>
+        <h3 class="text-white mb-2">NEVER MISS A JACKPOT</h3>
+        <p class="text-secondary mb-4">
+          Subscribe to our newsletter to receive deposit bonuses, exclusive free spins, and live tournament keys directly.
+        </p>
+        <form (submit)="subscribeNewsletter(emailInput.value, $event)" class="newsletter-form d-flex gap-2">
+          <input #emailInput type="email" placeholder="Enter your email address..." class="form-control rounded-pill px-4 newsletter-input" required />
+          <button type="submit" class="btn btn-signup rounded-pill px-4">SUBSCRIBE</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</div>

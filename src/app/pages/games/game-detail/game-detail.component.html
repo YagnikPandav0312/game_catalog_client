@@ -1,0 +1,109 @@
+<div class="game-detail-wrapper container-fluid px-4 py-4" *ngIf="game()">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb-nav mb-4">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a routerLink="/">Home</a></li>
+      <li class="breadcrumb-item"><a routerLink="/games">Games</a></li>
+      <li class="breadcrumb-item active">{{ game()?.title }}</li>
+    </ol>
+  </nav>
+
+  <!-- Large Game Banner Header -->
+  <section class="game-banner rounded-4 p-4 p-md-5 mb-5 overflow-hidden position-relative">
+    <!-- Blurred Background Backdrop -->
+    <div class="banner-backdrop" [style.background-image]="'url(' + game()?.image + ')'"></div>
+    <div class="banner-overlay"></div>
+
+    <div class="row align-items-center position-relative z-3 gy-4">
+      <div class="col-md-4 col-lg-3 text-center text-md-start">
+        <div class="game-poster-card rounded-3 shadow-lg mx-auto mx-md-0">
+          <img [src]="game()?.image" [alt]="game()?.title" class="img-fluid rounded-3" />
+        </div>
+      </div>
+      <div class="col-md-8 col-lg-9 text-center text-md-start text-white">
+        <span class="badge text-uppercase bg-purple-glow text-purple mb-2 px-3 py-2 rounded-pill font-weight-bold">
+          {{ game()?.gameType }}
+        </span>
+        <h1 class="game-title mb-2">{{ game()?.title }}</h1>
+        <div class="d-flex flex-wrap justify-content-center justify-content-md-start align-items-center gap-3 mb-4 text-secondary">
+          <span>Provider: <a [routerLink]="['/providers', game()?.providerSlug]" class="text-gold font-weight-bold text-decoration-none">{{ game()?.provider }}</a></span>
+          <span class="bullet-dot"></span>
+          <span>Category: <span class="text-white">{{ game()?.category }}</span></span>
+        </div>
+
+        <div class="banner-actions d-flex flex-wrap justify-content-center justify-content-md-start gap-3">
+          <button class="btn btn-signup btn-lg px-5 py-3 font-weight-bold" (click)="onPlay()">
+            <i class="fas fa-play me-2"></i>PLAY NOW
+          </button>
+          <button class="btn btn-login btn-lg px-4 py-3" (click)="onFavoriteToggle()">
+            <i [class]="game()?.isFavorite ? 'fas fa-heart text-danger' : 'far fa-heart me-2'"></i> 
+            {{ game()?.isFavorite ? 'FAVORITED' : 'ADD TO FAVORITES' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Specs Sheets & Description -->
+  <div class="row g-4 mb-5">
+    <div class="col-lg-8">
+      <div class="bio-card glassmorphism rounded-3 p-4 mb-4">
+        <h4 class="text-white mb-3">About {{ game()?.title }}</h4>
+        <p class="text-secondary description-para">
+          Immerse yourself in {{ game()?.title }}, developed by {{ game()?.provider }}. This release belongs to the {{ game()?.category }} class, featuring highly interactive pay tables, gorgeous artwork styles, and a custom soundtrack. Test your strategies using our flexible betting levels and feel the gaming action!
+        </p>
+      </div>
+
+      <!-- Related Games Grid -->
+      <div class="related-section">
+        <h4 class="text-white mb-4"><i class="fas fa-layer-group text-purple me-2"></i>RELATED GAMES</h4>
+        <div class="row row-cols-2 row-cols-md-4 g-3">
+          @for (rel of relatedGames(); track rel.id) {
+            <div class="col">
+              <div class="related-game-card glow-on-hover rounded-3 p-2 border border-secondary border-opacity-10" [routerLink]="['/games', rel.slug]" style="cursor: pointer;">
+                <div class="related-thumbnail mb-2 rounded overflow-hidden">
+                  <img [src]="rel.image" [alt]="rel.title" class="img-fluid" />
+                </div>
+                <h6 class="text-white text-truncate m-0">{{ rel.title }}</h6>
+                <small class="text-secondary text-truncate">{{ rel.provider }}</small>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Specs List Column -->
+    <div class="col-lg-4">
+      <div class="specs-card glassmorphism rounded-3 p-4">
+        <h4 class="text-white mb-4"><i class="fas fa-info-circle text-gold me-2"></i>GAME SPECS</h4>
+        <div class="specs-table">
+          <div class="spec-row py-3 d-flex justify-content-between border-bottom">
+            <span class="spec-key text-secondary">RTP</span>
+            <span class="spec-value text-gold font-weight-bold">{{ game()?.rtp }}</span>
+          </div>
+          <div class="spec-row py-3 d-flex justify-content-between border-bottom">
+            <span class="spec-key text-secondary">Volatility</span>
+            <span class="spec-value text-purple font-weight-bold">{{ game()?.volatility }}</span>
+          </div>
+          <div class="spec-row py-3 d-flex justify-content-between border-bottom">
+            <span class="spec-key text-secondary">Release Date</span>
+            <span class="spec-value text-white">{{ game()?.releaseDate }}</span>
+          </div>
+          <div class="spec-row py-3 d-flex justify-content-between border-bottom">
+            <span class="spec-key text-secondary">Min Bet</span>
+            <span class="spec-value text-white">{{ game()?.minBet }}</span>
+          </div>
+          <div class="spec-row py-3 d-flex justify-content-between border-bottom">
+            <span class="spec-key text-secondary">Max Bet</span>
+            <span class="spec-value text-white">{{ game()?.maxBet }}</span>
+          </div>
+          <div class="spec-row py-3 d-flex justify-content-between">
+            <span class="spec-key text-secondary">Device Compatible</span>
+            <span class="spec-value text-white">{{ game()?.deviceType }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
