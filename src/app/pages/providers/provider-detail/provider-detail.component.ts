@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Home } from '../../../core/services/home';
 
 export interface ProviderDetail {
   name: string;
@@ -30,85 +31,80 @@ export interface GameItem {
 })
 export class ProviderDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly homeService = inject(Home);
 
   readonly provider = signal<ProviderDetail | null>(null);
   readonly searchQuery = signal<string>('');
   readonly currentPage = signal<number>(1);
   readonly pageSize = 6; // paginating games
 
-  // All mock games for filter illustration
-  private readonly allGames = signal<GameItem[]>([
-    { id: 1, title: 'Sweet Bonanza', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', category: 'Slots', slug: 'sweet-bonanza' },
-    { id: 2, title: 'Gates of Olympus', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=400&q=80', category: 'Slots', slug: 'gates-of-olympus' },
-    { id: 3, title: 'The Dog House', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400&q=80', category: 'Slots', slug: 'the-dog-house-megaways' },
-    { id: 4, title: 'Sugar Rush', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1581798459219-318e76aecc7b?w=400&q=80', category: 'Slots', slug: 'sugar-rush' },
-    { id: 5, title: 'Joker\'s Jewels', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=400&q=80', category: 'Slots', slug: 'jokers-jewels' },
-    { id: 6, title: 'Wild West Gold', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1519074002996-a69e7ac46a42?w=400&q=80', category: 'Slots', slug: 'wild-west-gold' },
-    { id: 7, title: 'Buffalo King Megaways', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=400&q=80', category: 'Slots', slug: 'buffalo-king-megaways' },
-    { id: 8, title: 'Cash Bonanza', provider: 'Pragmatic Play', providerSlug: 'pragmatic-play', image: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=400&q=80', category: 'Slots', slug: 'cash-bonanza' },
-    
-    { id: 21, title: 'Lightning Roulette', provider: 'Evolution Gaming', providerSlug: 'evolution', image: 'https://images.unsplash.com/photo-1606167668584-78701c57f13d?w=400&q=80', category: 'Live Casino', slug: 'lightning-roulette' },
-    { id: 22, title: 'Crazy Time', provider: 'Evolution Gaming', providerSlug: 'evolution', image: 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80', category: 'Live Casino', slug: 'crazy-time' },
-    
-    { id: 31, title: 'Floating Dragon', provider: 'PG Soft', providerSlug: 'pg-soft', image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80', category: 'Slots', slug: 'floating-dragon' },
-    
-    { id: 41, title: 'Starburst', provider: 'NetEnt', providerSlug: 'netent', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&q=80', category: 'Slots', slug: 'starburst' }
-  ]);
-
-  private readonly providersInfo: Record<string, ProviderDetail> = {
-    'pragmatic-play': {
-      name: 'Pragmatic Play',
-      logo: 'fas fa-gamepad text-danger',
-      slug: 'pragmatic-play',
-      description: 'Pragmatic Play is a leading game developer providing player-favourites to the most successful global brands in the iGaming industry.',
-      gameCount: 250,
-      avgRtp: '96.50%',
-      volatility: 'HIGH'
-    },
-    'evolution': {
-      name: 'Evolution Gaming',
-      logo: 'fas fa-video text-warning',
-      slug: 'evolution',
-      description: 'Evolution Gaming is the world leader in video-streamed Live Dealer gaming, working with more top-tier operators than any other provider.',
-      gameCount: 85,
-      avgRtp: '97.20%',
-      volatility: 'MEDIUM'
-    },
-    'pg-soft': {
-      name: 'PG Soft',
-      logo: 'fas fa-mobile-alt text-primary',
-      slug: 'pg-soft',
-      description: 'Pocket Games Soft is a mobile game development studio. They create high-spec mobile slots optimized for portrait layouts.',
-      gameCount: 65,
-      avgRtp: '96.70%',
-      volatility: 'MEDIUM'
-    },
-    'netent': {
-      name: 'NetEnt',
-      logo: 'fas fa-cube text-success',
-      slug: 'netent',
-      description: 'NetEnt is a premium gaming system provider used by the world’s most successful online casino operators. A true pioneer in slot gaming concepts.',
-      gameCount: 110,
-      avgRtp: '96.20%',
-      volatility: 'HIGH'
-    }
-  };
+  readonly allGames = signal<GameItem[]>([]);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug') || '';
-      const info = this.providersInfo[slug] || {
-        name: slug.replace(/-/g, ' ').toUpperCase(),
-        logo: 'fas fa-dice text-light',
-        slug: slug,
-        description: 'Premium gaming content developer supplying slots and table releases globally.',
-        gameCount: 10,
-        avgRtp: '96.10%',
-        volatility: 'HIGH'
-      };
-      this.provider.set(info);
-      this.currentPage.set(1);
-      this.searchQuery.set('');
+
+      this.homeService.getHome().subscribe({
+        next: (res) => {
+          if (res && res.status.code === 0 && res.data) {
+            const games = res.data.games || [];
+            const providers = res.data.providers || [];
+
+            // Find matching provider
+            const dbProvider = providers.find((p: any) => p.slug === slug);
+
+            if (dbProvider) {
+              // Get games by this provider
+              const providerGamesList = games.filter((g: any) => g.provider_name === dbProvider.provider_name);
+
+              // Calculate dynamic Avg RTP
+              let avgRtpVal = 96.50;
+              if (providerGamesList.length > 0) {
+                const totalRtp = providerGamesList.reduce((acc: number, g: any) => acc + parseFloat(g.rtp || '96.5'), 0);
+                avgRtpVal = totalRtp / providerGamesList.length;
+              }
+
+              const info: ProviderDetail = {
+                name: dbProvider.provider_name,
+                logo: dbProvider.logo,
+                slug: dbProvider.slug,
+                description: dbProvider.description || `${dbProvider.provider_name} is a leading game developer providing player-favourites to online gaming catalog.`,
+                gameCount: providerGamesList.length,
+                avgRtp: `${avgRtpVal.toFixed(2)}%`,
+                volatility: 'HIGH'
+              };
+
+              // Map all games for internal state
+              const mappedGames: GameItem[] = games.map((g: any) => ({
+                id: g.game_id,
+                title: g.game_name,
+                provider: g.provider_name,
+                providerSlug: g.provider_name.toLowerCase().replace(/\s+/g, '-'),
+                image: g.thumbnail,
+                category: g.game_type_name,
+                slug: g.slug
+              }));
+
+              this.allGames.set(mappedGames);
+              this.provider.set(info);
+            } else {
+              // Fallback
+              const fallbackInfo: ProviderDetail = {
+                name: slug.replace(/-/g, ' ').toUpperCase(),
+                logo: 'fas fa-dice text-light',
+                slug: slug,
+                description: 'Premium gaming content developer supplying slots and table releases globally.',
+                gameCount: 0,
+                avgRtp: '96.10%',
+                volatility: 'HIGH'
+              };
+              this.provider.set(fallbackInfo);
+            }
+          }
+          this.currentPage.set(1);
+          this.searchQuery.set('');
+        }
+      });
     });
   }
 

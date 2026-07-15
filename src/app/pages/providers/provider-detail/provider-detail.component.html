@@ -10,8 +10,12 @@
 
   <!-- Provider Bio Banner -->
   <div class="bio-banner rounded-4 p-4 p-md-5 mb-5 d-flex flex-column flex-lg-row align-items-center gap-4">
-    <div class="provider-logo-emblem glassmorphism rounded-circle">
-      <i [class]="provider()?.logo + ' emblem-icon'"></i>
+    <div class="provider-logo-emblem glassmorphism rounded-circle d-flex align-items-center justify-content-center overflow-hidden">
+      @if (provider()?.logo && (provider()?.logo?.startsWith('http') || provider()?.logo?.startsWith('/') || provider()?.logo?.includes('.'))) {
+        <img [src]="provider()?.logo" [alt]="provider()?.name" class="provider-emblem-img" />
+      } @else {
+        <i [class]="provider()?.logo + ' emblem-icon'"></i>
+      }
     </div>
     <div class="provider-info flex-grow-1 text-center text-lg-start">
       <h1 class="text-white mb-2 text-uppercase">{{ provider()?.name }}</h1>

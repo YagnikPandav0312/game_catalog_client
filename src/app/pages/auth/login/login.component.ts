@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastService } from '../../../core/services/toast';
 
 @Component({
   selector: 'app-login',
@@ -34,12 +34,22 @@ export class LoginComponent {
       return;
     }
 
-    const { email } = this.loginForm.value;
+    const { email, password } = this.loginForm.value;
     
-    this.authService.login(email);
-    this.toastService.success('Logged in successfully!');
-
-    const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    this.router.navigateByUrl(returnUrl);
+    this.authService.login(email, password).subscribe({
+      next: (response) => {
+        if (response && response.status && response.status.code === 0) {
+          this.toastService.success('Logged in successfully!');
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          this.router.navigateByUrl(returnUrl);
+        } else {
+          this.toastService.error(response?.status?.message || 'Invalid Credentials');
+        }
+      },
+      error: (err) => {
+        const errorMsg = err.error?.status?.message || 'Login failed. Please try again.';
+        this.toastService.error(errorMsg);
+      }
+    });
   }
 }

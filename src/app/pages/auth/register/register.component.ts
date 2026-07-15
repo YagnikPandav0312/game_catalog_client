@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastService } from '../../../core/services/toast';
 
 @Component({
   selector: 'app-register',
@@ -35,10 +35,21 @@ export class RegisterComponent {
       return;
     }
 
-    const { username, email } = this.registerForm.value;
+    const { username, email, password } = this.registerForm.value;
     
-    this.authService.register(username, email);
-    this.toastService.success('Account created successfully! Welcome!');
-    this.router.navigate(['/']);
+    this.authService.register(username, email, password).subscribe({
+      next: (response) => {
+        if (response && response.status && response.status.code === 0) {
+          this.toastService.success(response.status.message || 'Account created successfully! Please log in.');
+          this.router.navigate(['/login']);
+        } else {
+          this.toastService.error(response?.status?.message || 'Registration failed');
+        }
+      },
+      error: (err) => {
+        const errorMsg = err.error?.status?.message || 'Registration failed. Please try again.';
+        this.toastService.error(errorMsg);
+      }
+    });
   }
 }

@@ -2,7 +2,7 @@ import { Component, signal, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
-import { ToastService } from '../../core/services/toast.service';
+import { ToastService } from '../../core/services/toast';
 
 @Component({
   selector: 'app-header',
@@ -52,9 +52,22 @@ export class HeaderComponent {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.closeProfileDropdown();
-    this.toastService.info('Logged out successfully.');
-    this.router.navigate(['/']);
+    this.authService.logout().subscribe({
+      next: (res: any) => {
+        if (res && res.status.code == 0) {
+          this.closeProfileDropdown();
+          this.toastService.success(res.status.message, 'Success');
+          this.router.navigate(['/']);
+        }
+        else {
+          this.toastService.error(res.status.message, 'Error');
+        }
+      },
+      error: (err) => {
+        this.closeProfileDropdown();
+        this.toastService.error(err);
+        this.router.navigate(['/']);
+      }
+    });
   }
 }

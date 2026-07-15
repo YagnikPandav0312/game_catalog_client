@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl, ValidationErrors } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastService } from '../../../core/services/toast';
 
 @Component({
   selector: 'app-reset-password',

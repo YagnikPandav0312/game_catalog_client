@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { ToastService } from '../../../core/services/toast.service';
+import { ToastService } from '../../../core/services/toast';
 
 export interface GameDetails {
   id: number;
