@@ -1,7 +1,9 @@
 import { Component, signal, computed, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { Home } from '../../../core/services/home';
+import { Providers } from '../../../core/services/providers';
+import { Games } from '../../../core/services/games';
+import { Common } from '../../../core/services/common';
 
 export interface ProviderDetail {
   name: string;
@@ -14,7 +16,7 @@ export interface ProviderDetail {
 }
 
 export interface GameItem {
-  id: number;
+  game_id: number;
   title: string;
   provider: string;
   providerSlug: string;
@@ -31,7 +33,9 @@ export interface GameItem {
 })
 export class ProviderDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly homeService = inject(Home);
+  private readonly providersService = inject(Providers);
+  private readonly gamesService = inject(Games);
+  private readonly commonService = inject(Common);
 
   readonly provider = signal<ProviderDetail | null>(null);
   readonly searchQuery = signal<string>('');
@@ -43,50 +47,62 @@ export class ProviderDetailComponent implements OnInit {
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
       const slug = params.get('slug') || '';
+      this.commonService.showSpinner();
 
-      this.homeService.getHome().subscribe({
-        next: (res) => {
-          if (res && res.status.code === 0 && res.data) {
-            const games = res.data.games || [];
-            const providers = res.data.providers || [];
-
-            // Find matching provider
+      this.providersService.getProviders().subscribe({
+        next: (provRes) => {
+          if (provRes && provRes.status && provRes.status.code === 0 && provRes.data) {
+            const providers = provRes.data || [];
             const dbProvider = providers.find((p: any) => p.slug === slug);
 
             if (dbProvider) {
-              // Get games by this provider
-              const providerGamesList = games.filter((g: any) => g.provider_name === dbProvider.provider_name);
+              this.gamesService.getGames({ provider: slug }).subscribe({
+                next: (gamesRes) => {
+                  if (gamesRes && gamesRes.status && gamesRes.status.code === 0 && gamesRes.data) {
+                    const providerGamesList = gamesRes.data || [];
 
-              // Calculate dynamic Avg RTP
-              let avgRtpVal = 96.50;
-              if (providerGamesList.length > 0) {
-                const totalRtp = providerGamesList.reduce((acc: number, g: any) => acc + parseFloat(g.rtp || '96.5'), 0);
-                avgRtpVal = totalRtp / providerGamesList.length;
-              }
+                    // Calculate dynamic Avg RTP
+                    let avgRtpVal = 96.50;
+                    if (providerGamesList.length > 0) {
+                      const totalRtp = providerGamesList.reduce((acc: number, g: any) => acc + parseFloat(g.rtp || '96.5'), 0);
+                      avgRtpVal = totalRtp / providerGamesList.length;
+                    }
 
-              const info: ProviderDetail = {
-                name: dbProvider.provider_name,
-                logo: dbProvider.logo,
-                slug: dbProvider.slug,
-                description: dbProvider.description || `${dbProvider.provider_name} is a leading game developer providing player-favourites to online gaming catalog.`,
-                gameCount: providerGamesList.length,
-                avgRtp: `${avgRtpVal.toFixed(2)}%`,
-                volatility: 'HIGH'
-              };
+                    const info: ProviderDetail = {
+                      name: dbProvider.provider_name,
+                      logo: dbProvider.logo,
+                      slug: dbProvider.slug,
+                      description: dbProvider.description || `${dbProvider.provider_name} is a leading game developer providing player-favourites to online gaming catalog.`,
+                      gameCount: providerGamesList.length,
+                      avgRtp: `${avgRtpVal.toFixed(2)}%`,
+                      volatility: 'HIGH'
+                    };
 
-              // Map all games for internal state
-              const mappedGames: GameItem[] = games.map((g: any) => ({
-                id: g.game_id,
-                title: g.game_name,
-                provider: g.provider_name,
-                providerSlug: g.provider_name.toLowerCase().replace(/\s+/g, '-'),
-                image: g.thumbnail,
-                category: g.game_type_name,
-                slug: g.slug
-              }));
+                    // Map all games for internal state
+                    const mappedGames: GameItem[] = providerGamesList.map((g: any) => ({
+                      id: g.game_id,
+                      title: g.game_name,
+                      provider: g.provider_name,
+                      providerSlug: slug,
+                      image: g.thumbnail,
+                      category: g.game_type_name,
+                      slug: g.slug
+                    }));
 
-              this.allGames.set(mappedGames);
-              this.provider.set(info);
+                    this.allGames.set(mappedGames);
+                    this.provider.set(info);
+                  } else {
+                    if (gamesRes && gamesRes.status) {
+                      this.commonService.manageStatus(gamesRes.status);
+                    }
+                  }
+                  this.commonService.hideSpinner();
+                },
+                error: (err) => {
+                  this.commonService.manageStatus(err.status || { code: 2, message: 'Failed to load games data' });
+                  this.commonService.hideSpinner();
+                }
+              });
             } else {
               // Fallback
               const fallbackInfo: ProviderDetail = {
@@ -99,10 +115,21 @@ export class ProviderDetailComponent implements OnInit {
                 volatility: 'HIGH'
               };
               this.provider.set(fallbackInfo);
+              this.allGames.set([]);
+              this.commonService.hideSpinner();
             }
+          } else {
+            if (provRes && provRes.status) {
+              this.commonService.manageStatus(provRes.status);
+            }
+            this.commonService.hideSpinner();
           }
           this.currentPage.set(1);
           this.searchQuery.set('');
+        },
+        error: (err) => {
+          this.commonService.manageStatus(err.status || { code: 2, message: 'Failed to load providers data' });
+          this.commonService.hideSpinner();
         }
       });
     });

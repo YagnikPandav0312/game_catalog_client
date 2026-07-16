@@ -64,7 +64,7 @@
   <!-- Games Grid -->
   @if (paginatedGames().length > 0) {
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
-      @for (game of paginatedGames(); track game.id) {
+      @for (game of paginatedGames(); track game.game_id) {
         <div class="col">
           <app-game-card 
             [game]="game" 

@@ -16,5 +16,8 @@ export const API = {
     },
     categories_api: {
         get_categories: '/categories/getCategories'
+    },
+    filters_api: {
+        get_filters: '/filters/filters'
     }
 }

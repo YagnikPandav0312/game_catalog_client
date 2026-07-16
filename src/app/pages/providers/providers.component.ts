@@ -27,7 +27,7 @@ export class ProvidersComponent implements OnInit {
     this.commonService.showSpinner();
     forkJoin({
       providersRes: this.providersService.getProviders(),
-      gamesRes: this.gamesService.getGames()
+      gamesRes: this.gamesService.getGames({})
     }).subscribe({
       next: ({ providersRes, gamesRes }) => {
         if (providersRes && providersRes.status && providersRes.status.code === 0) {

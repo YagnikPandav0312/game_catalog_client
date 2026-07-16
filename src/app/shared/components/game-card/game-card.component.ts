@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 export interface GameItem {
-  id: number;
-  title: string;
-  provider: string;
-  providerSlug: string;
-  image: string;
-  category: string;
-  categorySlug: string;
-  gameType: string;
+  game_id: number;
+  game_name: string;
+  provider_name: string;
+  providerSlug?: string;
+  thumbnail: string;
+  category?: string;
+  categorySlug?: string;
+  game_type_name: string;
   deviceType: string;
   isFavorite: boolean;
   slug: string;

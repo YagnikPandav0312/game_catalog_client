@@ -72,7 +72,7 @@ export class CategoriesComponent implements OnInit {
     this.commonService.showSpinner();
     forkJoin({
       categoriesRes: this.categoriesService.getCategories(),
-      gamesRes: this.gamesService.getGames()
+      gamesRes: this.gamesService.getGames({})
     }).subscribe({
       next: ({ categoriesRes, gamesRes }) => {
         if (categoriesRes && categoriesRes.status && categoriesRes.status.code === 0) {

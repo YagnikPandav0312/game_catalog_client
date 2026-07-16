@@ -4,8 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GameCardComponent, GameItem } from '../../shared/components/game-card/game-card.component';
 import { ToastService } from '../../core/services/toast';
 import { Games } from '../../core/services/games';
-import { Providers } from '../../core/services/providers';
-import { Categories } from '../../core/services/categories';
+import { Filters } from '../../core/services/filters';
 import { Common } from '../../core/services/common';
 import { forkJoin } from 'rxjs';
 
@@ -13,45 +12,42 @@ import { forkJoin } from 'rxjs';
   selector: 'app-games',
   imports: [CommonModule, GameCardComponent],
   templateUrl: './games.component.html',
-  styleUrl: './games.component.scss'
+  styleUrl: './games.component.scss',
 })
 export class GamesComponent implements OnInit {
-  private readonly route = inject(ActivatedRoute);
-  private readonly toastService = inject(ToastService);
-  private readonly gamesService = inject(Games);
-  private readonly providersService = inject(Providers);
-  private readonly categoriesService = inject(Categories);
-  private readonly commonService = inject(Common);
+  route = inject(ActivatedRoute);
+  toastService = inject(ToastService);
+  gamesService = inject(Games);
+  filtersService = inject(Filters);
+  commonService = inject(Common);
+  isMobileFiltersOpen = signal(false);
 
-  readonly isMobileFiltersOpen = signal(false);
-  readonly isLoadingMore = signal(false);
-  
   // Filter States
-  readonly searchQuery = signal('');
-  readonly selectedProvider = signal('');
-  readonly selectedCategory = signal('');
-  readonly selectedGameTypes = signal<string[]>([]);
-  readonly selectedDevices = signal<string[]>([]);
-  readonly currentSort = signal('popularity');
-  
+  searchQuery = signal('');
+  selectedProvider = signal('');
+  selectedCategory = signal('');
+  selectedGameTypes = signal<string[]>([]);
+  selectedDevices = signal<string[]>([]);
+  currentSort = signal('popularity');
+
   // Pagination State
-  readonly itemsLimit = signal(8); // load first 8 games
+  currentPage = signal(1);
+  pageSize = signal(8);
+  sort_by = signal('game_name');
+  sort_order = signal('ASC');
+  totalRecords = signal(0);
 
   // Dynamic filter option lookups
-  readonly providers = signal<any[]>([]);
-  readonly categories = signal<any[]>([]);
-  readonly deviceTypes = signal(['Desktop', 'Mobile', 'Tablet']);
+  providers = signal<any[]>([]);
+  categories = signal<any[]>([]);
+  deviceTypes = signal<any[]>([]);
 
   // Dynamic collections
-  readonly allGames = signal<GameItem[]>([]);
-
-  readonly gameTypes = computed(() => {
-    const types = new Set(this.allGames().map(g => g.gameType));
-    return Array.from(types).filter(Boolean);
-  });
+  allGames = signal<GameItem[]>([]);
+  gameTypes = signal<any[]>([]);
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       if (params['category']) {
         this.selectedCategory.set(params['category']);
       }
@@ -62,198 +58,190 @@ export class GamesComponent implements OnInit {
         this.searchQuery.set('Zeus');
       }
     });
-
     this.loadAllData();
   }
 
-  private loadAllData(): void {
+  loadAllData(): void {
     this.commonService.showSpinner();
-    forkJoin({
-      gamesRes: this.gamesService.getGames(),
-      providersRes: this.providersService.getProviders(),
-      categoriesRes: this.categoriesService.getCategories()
-    }).subscribe({
-      next: ({ gamesRes, providersRes, categoriesRes }) => {
-        // Load games
+    this.loadGames();
+    this.loadFilters();
+  }
+
+  fetchGames(): void {
+    this.commonService.showSpinner();
+    let getPaginationPayload = {
+      page: this.currentPage(),
+      limit: this.pageSize(),
+      search: this.searchQuery()?.trim() || '',
+      sort_by: this.sort_by(),
+      sort_order: this.sort_order(),
+      game_types: this.selectedGameTypes(),
+      category: this.selectedCategory(),
+      provider: this.selectedProvider(),
+      device_types: this.selectedDevices(),
+    };
+    this.gamesService.getGames(getPaginationPayload).subscribe({
+      next: (gamesRes) => {
         if (gamesRes && gamesRes.status && gamesRes.status.code === 0) {
-          const games = gamesRes.data || [];
-          const mappedGames: GameItem[] = games.map((g: any) => {
-            const categoryInfo = this.getGameCategory(g.game_type_name);
-            let deviceType = 'Universal';
-            const devName = (g.device_type_name || '').toLowerCase();
-            if (devName.includes('mobile') || devName.includes('phone')) {
-              deviceType = 'Mobile';
-            } else if (devName.includes('tablet') || devName.includes('ipad')) {
-              deviceType = 'Tablet';
-            } else if (devName.includes('desktop') || devName.includes('pc')) {
-              deviceType = 'Desktop';
-            }
-
-            return {
-              id: g.game_id,
-              title: g.game_name,
-              provider: g.provider_name,
-              providerSlug: (g.provider_name || '').toLowerCase().replace(/[\s&]+/g, '-'),
-              image: g.thumbnail || 'https://images.unsplash.com/photo-1596838132731-3301c3fd4317?w=400&q=80',
-              category: categoryInfo.name,
-              categorySlug: categoryInfo.slug,
-              gameType: g.game_type_name || 'Slots',
-              deviceType: deviceType,
-              isFavorite: false,
-              slug: g.slug || (g.game_name || '').toLowerCase().replace(/[\s&]+/g, '-')
-            };
-          });
-          this.allGames.set(mappedGames);
+          this.allGames.set(gamesRes.data || []);
+          this.totalRecords.set(gamesRes.totalRecords || 0);
         }
+        this.commonService.hideSpinner();
+      },
+      error: (err) => {
+        this.commonService.manageStatus(err.status || { code: 2, message: 'Failed to load games' });
+        this.commonService.hideSpinner();
+      },
+    });
+  }
 
-        // Load providers
-        if (providersRes && providersRes.status && providersRes.status.code === 0) {
-          const providers = providersRes.data || [];
-          const mappedProviders = providers.map((p: any) => ({
-            id: p.provider_id,
-            name: p.provider_name,
-            slug: p.slug || (p.provider_name || '').toLowerCase().replace(/[\s&]+/g, '-')
-          }));
-          this.providers.set(mappedProviders);
-        }
+  loadGames(): void {
+    const payload = {
+      page: this.currentPage(),
+      limit: this.pageSize(),
+      search: this.searchQuery()?.trim() || '',
+      sort_by: this.sort_by(),
+      sort_order: this.sort_order(),
+      game_types: this.selectedGameTypes(),
+      category: this.selectedCategory(),
+      provider: this.selectedProvider(),
+      device_types: this.selectedDevices(),
+    };
 
-        // Load categories
-        if (categoriesRes && categoriesRes.status && categoriesRes.status.code === 0) {
-          const categories = categoriesRes.data || [];
-          const mappedCategories = categories.map((c: any) => ({
-            id: c.game_categorie_id,
-            name: c.game_categorie_name,
-            slug: c.slug || (c.game_categorie_name || '').toLowerCase().replace(/[\s&]+/g, '-')
-          }));
-          this.categories.set(mappedCategories);
+    this.gamesService.getGames(payload).subscribe({
+      next: (res: any) => {
+        if (res?.status?.code === 0) {
+          this.allGames.set(res.data || []);
+          this.totalRecords.set(res.totalRecords || 0);
         }
 
         this.commonService.hideSpinner();
       },
       error: (err) => {
-        this.commonService.manageStatus(err.status || { code: 2, message: 'Failed to load games data' });
+        this.commonService.manageStatus(err.status || { code: 2, message: 'Failed to load games' });
         this.commonService.hideSpinner();
-      }
+      },
     });
   }
 
-  private getGameCategory(gameTypeName: string): { name: string, slug: string } {
-    const typeName = (gameTypeName || '').toLowerCase();
-    if (typeName.includes('slot')) {
-      return { name: 'Slots', slug: 'slots' };
-    }
-    if (typeName.includes('live') || typeName.includes('show')) {
-      return { name: 'Live Casino', slug: 'live-casino' };
-    }
-    if (typeName.includes('baccarat')) {
-      return { name: 'Baccarat', slug: 'baccarat' };
-    }
-    if (typeName.includes('crash')) {
-      return { name: 'Instant Games', slug: 'instant-games' };
-    }
-    if (typeName.includes('roulette') || typeName.includes('blackjack') || typeName.includes('baccarat')) {
-      return { name: 'Table Games', slug: 'table-games' };
-    }
-    return { name: 'Slots', slug: 'slots' }; // Default fallback
+  loadFilters(): void {
+    this.filtersService.getFilters().subscribe({
+      next: (res: any) => {
+        if (res && res?.status?.code === 0) {
+          // const data = res.data || {};
+          // Providers
+          this.providers.set(res.data.providers);
+          //   (data.providers || []).map((p: any) => ({
+          //     id: p.provider_id,
+          //     name: p.provider_name,
+          //     slug: p.slug || (p.provider_name || '').toLowerCase().replace(/[\s&]+/g, '-'),
+          //   })),
+          // );
+          // Categories
+          this.categories.set(res.data.categories);
+          //   (data.categories || []).map((c: any) => ({
+          //     id: c.game_categorie_id,
+          //     name: c.game_categorie_name,
+          //     slug: c.slug || (c.game_categorie_name || '').toLowerCase().replace(/[\s&]+/g, '-'),
+          //   })),
+          // );
+          // Game Types
+          this.gameTypes.set(res.data.game_types);
+          // (data.game_types || []).map((gt: any) => gt.game_type_name));
+          // Device Types
+          this.deviceTypes.set(res.data.device_types);
+          // (data.device_types || []).map((dt: any) => dt.device_type_name));
+        }
+      },
+      error: (err) => {
+        this.commonService.manageStatus(
+          err.status || { code: 2, message: 'Failed to load filters' },
+        );
+      },
+    });
   }
 
-  readonly filteredGames = computed(() => {
-    let result = this.allGames();
-    
-    const search = this.searchQuery().toLowerCase().trim();
-    if (search) {
-      result = result.filter(g => g.title.toLowerCase().includes(search));
-    }
-    
-    const provider = this.selectedProvider();
-    if (provider) {
-      result = result.filter(g => g.providerSlug === provider);
-    }
-    
-    const category = this.selectedCategory();
-    if (category) {
-      result = result.filter(g => g.categorySlug === category);
-    }
-    
-    const types = this.selectedGameTypes();
-    if (types.length > 0) {
-      result = result.filter(g => types.includes(g.gameType));
-    }
-    
-    const devices = this.selectedDevices();
-    if (devices.length > 0) {
-      result = result.filter(g => devices.includes(g.deviceType) || g.deviceType === 'Universal');
-    }
-    
-    const sort = this.currentSort();
-    if (sort === 'az') {
-      result = [...result].sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sort === 'za') {
-      result = [...result].sort((a, b) => b.title.localeCompare(a.title));
-    }
-    
-    return result;
+  filteredGames = computed(() => {
+    return this.allGames();
   });
 
-  readonly paginatedGames = computed(() => {
-    return this.filteredGames().slice(0, this.itemsLimit());
+  paginatedGames = computed(() => {
+    return this.filteredGames();
   });
 
-  readonly hasMoreItems = computed(() => {
-    return this.itemsLimit() < this.filteredGames().length;
+  totalPages = computed(() => Math.ceil(this.totalRecords() / this.pageSize()));
+
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    return Array.from({ length: total }, (_, i) => i + 1);
   });
 
   onSearch(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchQuery.set(target.value);
     this.resetPagination();
+    this.fetchGames();
   }
 
   onProviderChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.selectedProvider.set(target.value);
     this.resetPagination();
+    this.fetchGames();
   }
 
   onCategoryChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.selectedCategory.set(target.value);
     this.resetPagination();
+    this.fetchGames();
   }
 
   toggleGameType(type: string): void {
-    this.selectedGameTypes.update(current => {
+    this.selectedGameTypes.update((current) => {
       if (current.includes(type)) {
-        return current.filter(t => t !== type);
+        return current.filter((t) => t !== type);
       } else {
         return [...current, type];
       }
     });
     this.resetPagination();
+    this.fetchGames();
   }
 
   toggleDevice(device: string): void {
-    this.selectedDevices.update(current => {
+    this.selectedDevices.update((current) => {
       if (current.includes(device)) {
-        return current.filter(d => d !== device);
+        return current.filter((d) => d !== device);
       } else {
         return [...current, device];
       }
     });
     this.resetPagination();
+    this.fetchGames();
   }
 
   onSortChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     this.currentSort.set(target.value);
+    if (target.value === 'az') {
+      this.sort_by.set('game_name');
+      this.sort_order.set('ASC');
+    } else if (target.value === 'za') {
+      this.sort_by.set('game_name');
+      this.sort_order.set('DESC');
+    } else {
+      this.sort_by.set('');
+      this.sort_order.set('');
+    }
+    this.fetchGames();
   }
 
-  loadMore(): void {
-    this.isLoadingMore.set(true);
-    setTimeout(() => {
-      this.itemsLimit.update(current => current + 8);
-      this.isLoadingMore.set(false);
-    }, 600);
+  goToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+      this.fetchGames();
+    }
   }
 
   clearFilters(): void {
@@ -263,33 +251,36 @@ export class GamesComponent implements OnInit {
     this.selectedGameTypes.set([]);
     this.selectedDevices.set([]);
     this.currentSort.set('popularity');
+    this.sort_by.set('');
+    this.sort_order.set('');
     this.resetPagination();
+    this.fetchGames();
   }
 
   toggleMobileFilters(): void {
-    this.isMobileFiltersOpen.update(v => !v);
+    this.isMobileFiltersOpen.update((v) => !v);
   }
 
-  private resetPagination(): void {
-    this.itemsLimit.set(8);
+  resetPagination(): void {
+    this.pageSize.set(8);
   }
 
   onFavoriteToggled(game: GameItem): void {
-    this.allGames.update(games => 
-      games.map(g => g.id === game.id ? { ...g, isFavorite: !g.isFavorite } : g)
+    this.allGames.update((games) =>
+      games.map((g) => (g.game_id === game.game_id ? { ...g, isFavorite: !g.isFavorite } : g)),
     );
-    
-    const targetGame = this.allGames().find(g => g.id === game.id);
+
+    const targetGame = this.allGames().find((g) => g.game_id === game.game_id);
     if (targetGame) {
       if (targetGame.isFavorite) {
-        this.toastService.success(`Added ${game.title} to Favorites!`);
+        this.toastService.success(`Added ${game.game_name} to Favorites!`);
       } else {
-        this.toastService.info(`Removed ${game.title} from Favorites`);
+        this.toastService.info(`Removed ${game.game_name} from Favorites`);
       }
     }
   }
 
   onPlayClicked(game: GameItem): void {
-    this.toastService.success(`Launching game: ${game.title}...`);
+    this.toastService.success(`Launching game: ${game.game_name}...`);
   }
 }

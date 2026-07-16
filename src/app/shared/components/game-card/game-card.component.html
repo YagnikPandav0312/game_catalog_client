@@ -1,6 +1,6 @@
 <div class="game-card-wrapper glow-on-hover" [routerLink]="['/games', game.slug]" style="cursor: pointer;">
   <div class="game-thumbnail-container">
-    <img [src]="game.image" [alt]="game.title" class="game-thumbnail img-fluid" loading="lazy" />
+    <img [src]="game.thumbnail" [alt]="game.game_name" class="game-thumbnail img-fluid" loading="lazy" />
     
     <!-- Hover Overlay -->
     <div class="hover-overlay">
@@ -14,10 +14,10 @@
   </div>
   
   <div class="game-meta mt-2">
-    <h5 class="game-title text-truncate text-white m-0">{{ game.title }}</h5>
+    <h5 class="game-title text-truncate text-white m-0">{{ game.game_name }}</h5>
     <div class="d-flex justify-content-between align-items-center mt-1">
-      <span class="game-provider text-truncate text-secondary">{{ game.provider }}</span>
-      <span class="badge badge-type rounded px-2 py-1 text-sm text-secondary">{{ game.gameType }}</span>
+      <span class="game-provider text-truncate text-secondary">{{ game.provider_name }}</span>
+      <span class="badge badge-type rounded px-2 py-1 text-sm text-secondary">{{ game.game_type_name }}</span>
     </div>
   </div>
 </div>
